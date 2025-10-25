@@ -1,91 +1,103 @@
 import SwiftUI
 
+// NOTE: This file assumes PlantReminder, ReminderStore, customDarkGray, and cyncolor
+// are defined in DataStore.swift.
+
 struct ReminderSheetView: View {
-    let onSave: () -> Void 
+    
+    // NEW: Binding to control the main app's flow
+    @Binding var isFirstTimeUser: Bool
+    
+    // REINSTATED: The store is needed to save the new reminder
+    @Bindable var store: ReminderStore
+
+    // State properties for the selected values
     @State private var plantName: String = "Pothos"
     @State private var selectedRoom: String = "Bedroom"
-    @State private var selectedLight: String = "Full sun"
-    @State private var selectedWateringDays: String = "Every day"
+    @State private var selectedLight: String = "Partial sun"
+    @State private var selectedWateringDays: String = "Once a week"
     @State private var selectedWaterAmount: String = "20-50 ml"
     
 
+    private let reminders = (
+        rooms: ["Living Room", "Bedroom", "Kitchen", "Balcony", "Bathroom"],
+        lights: ["Full sun", "Partial sun", "Shade"],
+        wateringDays: ["Every day", "Every 2 days", "Every 3 days", "Once a week", "Every 10 days", "Every 2 weeks"],
+        waterAmounts: ["10-20 ml", "20-50 ml", "50-100 ml", "200-300 ml"]
+    )
+    
     @Environment(\.dismiss) var dismiss
-
+    
     var body: some View {
         NavigationView {
             
             List {
-                
+                // MARK: - Plant Name Section
                 Section {
                     HStack(spacing: 20) {
-                        
                         Text("Plant Name")
                             .foregroundColor(.white)
                             .fontWeight(.semibold)
-                            .offset(y: -3)
                         
-                        TextField(plantName, text: $plantName)
-                            .foregroundColor(.gray)
+                        TextField("Enter Name", text: $plantName)
+                            .foregroundColor(.white.opacity(0.8))
                             .textInputAutocapitalization(.words)
-                            .offset(y: -3)
-                            .offset(x: -10)
-
-                        
+                            .multilineTextAlignment(.trailing)
                     }
                     .frame(minHeight: 44)
                 }
                 .listRowBackground(Color.customDarkGray)
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets(top: 10, leading: 20, bottom: 0, trailing: 20))
-
+                
+                // MARK: - Room and Light Section
                 Section {
                     HStack {
-                        Image(systemName: "paperplane.fill")
+                        Image(systemName: "paperplane")
                         Text("Room")
                         Spacer()
                         Menu {
-                            Button("Living Room") { selectedRoom = "Living Room" }
-                            Button("Bedroom") { selectedRoom = "Bedroom" }
-                            Button("Kitchen") { selectedRoom = "Kitchen" }
+                            ForEach(reminders.rooms, id: \.self) { room in
+                                Button(room) { selectedRoom = room }
+                            }
                         } label: {
                             HStack {
                                 Text(selectedRoom)
                                 Image(systemName: "chevron.right").font(.caption)
                             }
                             .foregroundColor(.gray)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
                         }
                     }
-
+                    
                     HStack {
-                        Image(systemName: "sun.max.fill")
+                        Image(systemName: "sun.max")
                         Text("Light")
                         Spacer()
                         Menu {
-                            Button("Full sun") { selectedLight = "Full sun" }
-                            Button("Partial sun") { selectedLight = "Partial sun" }
-                            Button("Shade") { selectedLight = "Shade" }
+                            ForEach(reminders.lights, id: \.self) { light in
+                                Button(light) { selectedLight = light }
+                            }
                         } label: {
                             HStack {
                                 Text(selectedLight)
                                 Image(systemName: "chevron.right").font(.caption)
                             }
                             .foregroundColor(.gray)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
                         }
                     }
                 }
                 .listRowBackground(Color.customDarkGray)
-
+                
+                // MARK: - Watering Section
                 Section {
                     HStack {
-                        Image(systemName: "drop.fill")
+                        Image(systemName: "drop")
                         Text("Watering Days")
                         Spacer()
                         Menu {
-                            Button("Every day") { selectedWateringDays = "Every day" }
-                            Button("Every 2 days") { selectedWateringDays = "Every 2 days" }
-                            Button("Once a week") { selectedWateringDays = "Once a week" }
+                            ForEach(reminders.wateringDays, id: \.self) { days in
+                                Button(days) { selectedWateringDays = days }
+                            }
                         } label: {
                             HStack {
                                 Text(selectedWateringDays)
@@ -93,62 +105,70 @@ struct ReminderSheetView: View {
                             }
                             .foregroundColor(.gray)
                         }
-                        .listRowBackground(Color.customDarkGray)
                     }
-
+                    
                     HStack {
-                        Image(systemName: "drop.fill")
-                        Text("Water")
+                        Image(systemName: "drop")
+                        Text("Water Amount")
                         Spacer()
                         Menu {
-                            Button("10-20 ml") { selectedWaterAmount = "10-20 ml" }
-                            Button("20-50 ml") { selectedWaterAmount = "20-50 ml" }
-                            Button("50-100 ml") { selectedWaterAmount = "50-100 ml" }
+                            ForEach(reminders.waterAmounts, id: \.self) { amount in
+                                Button(amount) { selectedWaterAmount = amount }
+                            }
                         } label: {
                             HStack {
                                 Text(selectedWaterAmount)
                                 Image(systemName: "chevron.right").font(.caption)
                             }
                             .foregroundColor(.gray)
-                            
                         }
                     }
                 }
                 .listRowBackground(Color.customDarkGray)
             }
-            //.scrollContentBackground(.hidden)
+            .background(Color.customDarkGray.edgesIgnoringSafeArea(.all))
             .listStyle(.insetGrouped)
             .navigationTitle("Set Reminder")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.white)
-                            .padding(8)
-
+                            .glassEffect(.regular.tint(.clear).interactive())
+                        
                     }
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        print("Reminder saved for \(plantName)!")
-                        onSave()
+                        // 1. Create the new PlantReminder object
+                        let newReminder = PlantReminder(
+                            plantName: plantName.isEmpty ? "Untitled Plant" : plantName,
+                            room: selectedRoom,
+                            light: selectedLight,
+                            wateringDays: selectedWateringDays,
+                            waterAmount: selectedWaterAmount
+                        )
+                        
+                        // 2. Save it to the shared store
+                        store.add(reminder: newReminder)
+                        
+                        // 3. Mark the app as initialized, which automatically transitions to ProgPage
+                        // This achieves the desired transition from the dummy page.
+                        isFirstTimeUser = false
+                        
+                        // 4. Dismiss the sheet
                         dismiss()
                     } label: {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.white)
-                            .padding(8)
-                        
-
                     }
                     .buttonStyle(.borderedProminent).tint(Color.cyncolor)
-                        
+                    .disabled(plantName.isEmpty)
                 }
-          
             }
         }
     }
@@ -156,7 +176,8 @@ struct ReminderSheetView: View {
 
 struct ReminderSheetView_Previews: PreviewProvider {
     static var previews: some View {
-        ReminderSheetView(onSave: {})
-        .presentationDetents([.medium, .large])
+        // Mock the store and pass a constant binding for isFirstTimeUser
+        ReminderSheetView(isFirstTimeUser: .constant(true), store: ReminderStore())
+            .presentationDetents([.medium, .large])
     }
 }
