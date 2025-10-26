@@ -1,6 +1,5 @@
 import SwiftUI
 
-
 struct MainPage: View {
 
     let customFontSize: CGFloat = 20
@@ -9,39 +8,37 @@ struct MainPage: View {
     let headerTopPadding: CGFloat = 55
 
     @State private var store = ReminderStore()
-
     @State private var isFirstTimeUser: Bool = true
-
     @State private var isShowingSheet = false
 
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
-
+                
                 if isFirstTimeUser {
                     VStack(spacing: 10) {
-
+                        
                         Spacer().frame(height: 100)
-
+                        
                         Image("Face1")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 200, height: 200)
-
+                        
                         Text("Start your plant journey!")
                             .font(.title)
                             .foregroundColor(.white)
                             .offset(y: 20)
-
+                        
                         Text("Now all your plants will be in one place and we will help you take care of them :) 🪴")
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 20)
                             .foregroundColor(lineColor)
                             .offset(y: 20)
-
+                        
                         Spacer()
-
+                        
                         Button(action: {
                             print("Set plant reminder button tapped")
                             isShowingSheet = true
@@ -52,17 +49,14 @@ struct MainPage: View {
                                 .padding(.vertical)
                                 .padding(.horizontal,80)
                                 .glassEffect(.regular.tint(.cyncolor).interactive())
-                                //.background(Color.cyncolor)
                                 .cornerRadius(30)
                         }
                         .offset(y:-200)
                     }
                 } else {
                     ProgPage(store: store, isShowingSheet: $isShowingSheet)
-                   // ProgPage(store :store)
                 }
             }
-
             .sheet(isPresented: $isShowingSheet){
                 ReminderSheetView(isFirstTimeUser: $isFirstTimeUser, store: store)
                     .presentationDetents([.large, .large])
@@ -70,7 +64,9 @@ struct MainPage: View {
         }
     }
 }
+
 #Preview
 {
     MainPage()
 }
+
