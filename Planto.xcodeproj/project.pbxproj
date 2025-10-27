@@ -30,7 +30,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		BF67AD362EA1348B0009FB03 /* Exceptions for "Planto" folder in "Planto" target */ = {
+		BF8262132EAF99400054A74B /* Exceptions for "Planto" folder in "Planto" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -43,7 +43,7 @@
 		BF67AD0D2EA118AC0009FB03 /* Planto */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				BF67AD362EA1348B0009FB03 /* Exceptions for "Planto" folder in "Planto" target */,
+				BF8262132EAF99400054A74B /* Exceptions for "Planto" folder in "Planto" target */,
 			);
 			path = Planto;
 			sourceTree = "<group>";

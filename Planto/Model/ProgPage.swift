@@ -22,6 +22,26 @@ struct ThickProgressBar: View {
     }
 }
 
+// --- Info Tag View ---
+struct InfoTagView: View {
+    let iconName: String
+    let text: String
+    var accentColor: Color?
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: iconName)
+            Text(text)
+        }
+        .font(.caption)
+        .foregroundColor(accentColor ?? Color(.systemGray2))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(8)
+    }
+}
+
 // --- Supporting Views ---
 struct PlantRowView: View {
     var reminder: PlantReminder
@@ -33,8 +53,8 @@ struct PlantRowView: View {
         let dimOpacity: Double = isChecked ? 0.55 : 1.0
         let saturation: Double = isChecked ? 0.0  : 1.0
 
-        HStack {
-            // Cyan checkbox stays vivid
+        HStack(spacing: 10) {
+            // Cyan checkbox (leading) — aligns with List content margin
             Button(action: {
                 withAnimation(.easeInOut(duration: 0.25)) {
                     isChecked.toggle()
@@ -47,7 +67,6 @@ struct PlantRowView: View {
                     .frame(width: 30, height: 30)
                     .foregroundColor(.cyncolor)
             }
-            .padding(.trailing, 10)
 
             VStack(alignment: .leading, spacing: 5) {
                 HStack {
@@ -62,27 +81,30 @@ struct PlantRowView: View {
                     .foregroundColor(.white)
                     .strikethrough(isChecked, color: .white.opacity(0.7))
 
-                HStack(spacing: 15) {
-                    HStack { Image(systemName: "sun.max"); Text(reminder.light) }
-                    HStack { Image(systemName: "drop"); Text("\(reminder.waterAmount)") }
+                HStack(spacing: 8) {
+                    InfoTagView(iconName: "sun.max", text: reminder.light, accentColor: Color("light-color"))
+                    InfoTagView(iconName: "drop", text: reminder.waterAmount, accentColor: Color("water-color"))
                 }
                 .font(.footnote)
                 .foregroundColor(.gray)
             }
-            Spacer()
+
+            Spacer(minLength: 0)
         }
-        .padding(.vertical, 15)
-        .padding(.horizontal)
+        // tighter, centered rows
+        .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 15).fill(Color.customDarkGray)
+            // Invisible background to keep touch area comfy
+            RoundedRectangle(cornerRadius: 12).fill(Color.clear)
         )
         // fade out content but keep cyan icon untouched
         .saturation(saturation)
         .opacity(dimOpacity)
         .animation(.easeInOut(duration: 0.25), value: isChecked)
-        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+        // IMPORTANT: no extra insets; List content margins control the left edge
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden)
+        .listRowSeparator(.hidden) // we'll draw our own divider for consistent alignment
     }
 }
 
@@ -97,68 +119,8 @@ struct ProgressHeaderView: View {
             ThickProgressBar(progress: completionProgress, height: 16)
                 .background(Color.clear)
         }
-        .padding(.horizontal, 25)
+        .padding(.horizontal, 20) // this defines the shared content margin
         .padding(.vertical, 15)
-    }
-}
-
-// --- Edit Picker Sheet ---
-private struct EditReminderPickerView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Bindable var store: ReminderStore
-
-    var body: some View {
-        NavigationStack {
-            Group {
-                if store.reminders.isEmpty {
-                    List {
-                        Section {
-                            ContentUnavailableView(
-                                "No Reminders",
-                                systemImage: "leaf"
-                            )
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                        }
-                    }
-                    .scrollContentBackground(.hidden)
-                    .background(Color.customDarkGray)
-                } else {
-                    List {
-                        Section("Choose a reminder") {
-                            ForEach(store.reminders) { r in
-                                NavigationLink {
-                                    EditReminderView(reminder: r, store: store)
-                                } label: {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(r.plantName)
-                                            .foregroundColor(.white)
-                                            .fontWeight(.semibold)
-                                        Text("in \(r.room) • \(r.light) • \(r.wateringDays) • \(r.waterAmount)")
-                                            .font(.footnote)
-                                            .foregroundColor(.gray)
-                                    }
-                                    .padding(.vertical, 4)
-                                }
-                                .listRowBackground(Color.customDarkGray)
-                            }
-                        }
-                    }
-                    .scrollContentBackground(.hidden)
-                    .background(Color.customDarkGray)
-                }
-            }
-            .navigationTitle("Edit Reminder")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.customDarkGray, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Close") { dismiss() }.foregroundColor(.white)
-                }
-            }
-        }
     }
 }
 
@@ -167,7 +129,11 @@ struct ProgPage: View {
     @Bindable var store: ReminderStore
     @Binding var isShowingSheet: Bool
     @State private var completedCount: Int = 0
-    @State private var isEditPickerPresented: Bool = false
+
+    // Selected reminder for editing via swipe
+    @State private var editingReminder: PlantReminder? = nil
+
+    private let contentMargin: CGFloat = 20 // shared with header & list
 
     var completionProgress: Double {
         guard !store.reminders.isEmpty else { return 0 }
@@ -184,30 +150,39 @@ struct ProgPage: View {
                 if isGoalCompleted {
                     VStack {
                         Spacer()
-                        VStack {
+                        VStack (spacing : 15){
+                            
+                            Spacer().frame(height: 100)
+
                             Image("Celb")
                                 .resizable()
-                                .aspectRatio(contentMode: .fill)
+                                .aspectRatio(contentMode: .fit)
                                 .frame(width: 300, height: 300)
+                              //  .offset(y:100)
                             
+                            Text("All done! 🎉")
+                                .font(.title)
+                                .offset(y:-80)
+                            
+                            Text("All reminders Completed ")
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 20)
+                                .foregroundColor(Color.gray)
+                                .offset(y: -80)
+                            
+                            Spacer()
                         }
                         Spacer()
                     }
-//                    .background(Color.black.ignoresSafeArea())
-//                    .navigationTitle("My Plants 🌱")
-//                    .padding(.leading, 25)
                 } else {
                     VStack(spacing: 0) {
-                        // Title + Edit button header
+                        // Title
                         HStack {
                             Text("My Plants 🌱")
                                 .font(.largeTitle.bold())
                                 .foregroundColor(.white)
-                                .padding(.leading, 25)
-                            Spacer()
-                            Button("Edit") { isEditPickerPresented = true }
-                                .foregroundColor(.white)
-                                .padding(.trailing, 25)
+                                .padding(.leading, contentMargin)
+                            Spacer(minLength: 0)
                         }
                         .padding(.top, 50)
                         .padding(.bottom, 10)
@@ -218,7 +193,7 @@ struct ProgPage: View {
                             if store.reminders.isEmpty {
                                 Section {
                                     ContentUnavailableView("No Reminders Set",
-                                        systemImage: "drop")
+                                                          systemImage: "drop")
                                     .frame(maxWidth: .infinity)
                                     .padding(.top, 100)
                                     .foregroundColor(.gray)
@@ -227,26 +202,45 @@ struct ProgPage: View {
                                 }
                             } else {
                                 Section {
-                                    ForEach(store.reminders) { reminder in
+                                    // enumerate to draw divider only between rows
+                                    ForEach(Array(store.reminders.enumerated()), id: \.element.id) { idx, reminder in
                                         PlantRowView(reminder: reminder) { isChecked in
                                             if isChecked { completedCount += 1 } else { completedCount -= 1 }
                                             completedCount = max(0, completedCount)
                                         }
-                                        .padding(.horizontal, 25)
-                                        .padding(.vertical, 8)
+                                        // LEADING SWIPE TO EDIT (left -> right), no full swipe to avoid checkbox conflict
+                                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                            Button {
+                                                editingReminder = reminder
+                                            } label: {
+                                                Label {
+                                                    Text("Edit")
+                                                } icon: {
+                                                    Image(systemName: "pencil")
+                                                }
+                                            }
+                                            .tint(.cyncolor)
+                                        }
+                                        // Custom divider aligned with the same left margin as progress bar
+                                        .overlay(alignment: .bottomLeading) {
+                                            if idx < store.reminders.count - 1 {
+                                                Divider()
+                                                    .opacity(0.15)
+                                                    .padding(.leading, contentMargin) // align with checkbox / progress bar
+                                            }
+                                        }
                                     }
                                     .onDelete { indexSet in store.delete(at: indexSet) }
-
-                                    Color.clear
-                                        .frame(height: 90)
-                                        .listRowBackground(Color.clear)
-                                        .listRowSeparator(.hidden)
                                 }
                             }
                         }
                         .listStyle(.plain)
                         .scrollContentBackground(.hidden)
                         .background(Color.black)
+                        // iOS 17+: unify side margins for the whole list
+                        .modifier(HorizontalContentMarginsIfAvailable(contentMargin))
+                        // iOS 16 and earlier fallback: apply same horizontal padding to list content
+                        .modifier(HorizontalListPaddingIfOldiOS(contentMargin))
                     }
                     .navigationTitle("")
                     .toolbarBackground(.hidden, for: .navigationBar)
@@ -278,9 +272,39 @@ struct ProgPage: View {
             .padding(.trailing, 25)
             .padding(.bottom, 20)
         }
-        .sheet(isPresented: $isEditPickerPresented) {
-            EditReminderPickerView(store: store)
-                .presentationDetents([.medium, .large])
+        // give space for the FAB without adding a giant row gap
+        .safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: 70)
+        }
+        // EDIT SHEET for the selected row
+        .sheet(item: $editingReminder) { r in
+            EditReminderView(reminder: r, store: store)
+        }
+    }
+}
+
+// Helpers to apply consistent horizontal margins on all iOS versions
+private struct HorizontalContentMarginsIfAvailable: ViewModifier {
+    let value: CGFloat
+    init(_ value: CGFloat) { self.value = value }
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, *) {
+            content.contentMargins(.horizontal, value)
+        } else {
+            content
+        }
+    }
+}
+
+private struct HorizontalListPaddingIfOldiOS: ViewModifier {
+    let value: CGFloat
+    init(_ value: CGFloat) { self.value = value }
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, *) {
+            content
+        } else {
+            // Pad the whole list so the checkbox aligns with the progress bar
+            content.padding(.horizontal, value)
         }
     }
 }

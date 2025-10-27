@@ -1,9 +1,8 @@
 import SwiftUI
 
-struct MainPage: View {
+struct StartPage: View {
 
     let customFontSize: CGFloat = 20
-    let lineColor = Color.gray
     let lineHeight: CGFloat = 0.5
     let headerTopPadding: CGFloat = 55
 
@@ -17,7 +16,7 @@ struct MainPage: View {
                 Color.black.ignoresSafeArea()
                 
                 if isFirstTimeUser {
-                    VStack(spacing: 10) {
+                    VStack(spacing: 15) {
                         
                         Spacer().frame(height: 100)
                         
@@ -34,7 +33,7 @@ struct MainPage: View {
                         Text("Now all your plants will be in one place and we will help you take care of them :) 🪴")
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 20)
-                            .foregroundColor(lineColor)
+                            .foregroundColor(Color.gray)
                             .offset(y: 20)
                         
                         Spacer()
@@ -48,6 +47,7 @@ struct MainPage: View {
                                 .foregroundColor(.white)
                                 .padding(.vertical)
                                 .padding(.horizontal,80)
+                             //   .glassEffect(.clear)
                                 .glassEffect(.regular.tint(.cyncolor).interactive())
                                 .cornerRadius(30)
                         }
@@ -67,6 +67,7 @@ struct MainPage: View {
 
 #Preview
 {
-    MainPage()
+    StartPage()
 }
+
 
