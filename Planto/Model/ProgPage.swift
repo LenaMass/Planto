@@ -54,7 +54,7 @@ struct PlantRowView: View {
         let saturation: Double = isChecked ? 0.0  : 1.0
 
         HStack(spacing: 10) {
-            // Cyan checkbox (leading) — aligns with List content margin
+            // Cyan checkbox (leading)
             Button(action: {
                 withAnimation(.easeInOut(duration: 0.25)) {
                     isChecked.toggle()
@@ -91,20 +91,15 @@ struct PlantRowView: View {
 
             Spacer(minLength: 0)
         }
-        // tighter, centered rows
         .padding(.vertical, 10)
-        .background(
-            // Invisible background to keep touch area comfy
-            RoundedRectangle(cornerRadius: 12).fill(Color.clear)
-        )
-        // fade out content but keep cyan icon untouched
+        .background(RoundedRectangle(cornerRadius: 12).fill(Color.clear))
         .saturation(saturation)
         .opacity(dimOpacity)
         .animation(.easeInOut(duration: 0.25), value: isChecked)
         // IMPORTANT: no extra insets; List content margins control the left edge
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden) // we'll draw our own divider for consistent alignment
+        .listRowSeparator(.hidden) // we draw our own divider for alignment
     }
 }
 
@@ -119,7 +114,7 @@ struct ProgressHeaderView: View {
             ThickProgressBar(progress: completionProgress, height: 16)
                 .background(Color.clear)
         }
-        .padding(.horizontal, 20) // this defines the shared content margin
+        .padding(.horizontal, 20) // shared content margin
         .padding(.vertical, 15)
     }
 }
@@ -150,26 +145,20 @@ struct ProgPage: View {
                 if isGoalCompleted {
                     VStack {
                         Spacer()
-                        VStack (spacing : 15){
-                            
+                        VStack (spacing: 15) {
                             Spacer().frame(height: 100)
-
                             Image("Celb")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 300, height: 300)
-                              //  .offset(y:100)
-                            
                             Text("All done! 🎉")
                                 .font(.title)
-                                .offset(y:-80)
-                            
+                                .offset(y: -80)
                             Text("All reminders Completed ")
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 20)
                                 .foregroundColor(Color.gray)
                                 .offset(y: -80)
-                            
                             Spacer()
                         }
                         Spacer()
@@ -221,12 +210,14 @@ struct ProgPage: View {
                                             }
                                             .tint(.cyncolor)
                                         }
-                                        // Custom divider aligned with the same left margin as progress bar
+                                        // Custom divider aligned with the same left/right margins
                                         .overlay(alignment: .bottomLeading) {
                                             if idx < store.reminders.count - 1 {
-                                                Divider()
-                                                    .opacity(0.15)
-                                                    .padding(.leading, contentMargin) // align with checkbox / progress bar
+                                                Rectangle()
+                                                    .fill(Color.white.opacity(0.18))
+                                                    .frame(height: 0.5)                  // 0.5pt line (no UIScreen.main)
+                                                    .padding(.leading, contentMargin)    // start at same x as progress bar / checkbox
+                                                    .padding(.trailing, contentMargin)   // end at same right margin
                                             }
                                         }
                                     }
@@ -308,3 +299,4 @@ private struct HorizontalListPaddingIfOldiOS: ViewModifier {
         }
     }
 }
+
