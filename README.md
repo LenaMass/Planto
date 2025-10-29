@@ -1,17 +1,23 @@
-Planto
+<h1 align="left">Planto?</h1>
 
-<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/5e37310f-9748-4b82-ad37-7bed4642ccca" />
+<h2 An iOS app that helps people to set daily reminders by watering and nurturing their plants to grow to accomplish their goals ./h2>
 
-An iOS app that helps people to set daily reminders by watering and nurturing their plants to grow to accomplish their goals .
+<h2 align="left">App features: </h2>
 
-App features : 
-* Input for you plant name, type , and reminder time.
-* Adding plants and editing them 
-* progress view to each reminder that’s completed 
-* Dark mode available and supported.
-
+<li  input for you plant name, type , and reminder time.
+Adding plants and editing them 
+progress view to each reminder that’s completed 
+dark mode available and supported. /li>
  
-App previews : 
+<h2 align="left">App previews:</h2>
 
-<img width="590" height="1278" alt="IMG_0012" src="https://github.com/user-attachments/assets/9e131821-446b-4d46-862f-66df507b08a1" /> <img width="590" height="1278" alt="IMG_0013" src="https://github.com/user-attachments/assets/0a3c02fe-51ce-4115-9227-fbcee3ba2ad4" />
-<img width="590" height="1278" alt="IMG_0016" src="https://github.com/user-attachments/assets/e3a15a07-803a-4cce-a18c-3a176f893689" /> <img width="590" height="1278" alt="IMG_0017" src="https://github.com/user-attachments/assets/6e8cb7d3-57f9-42b6-84ed-52afe2647836" />
+###
+
+<div align="left">
+<img width="590" height="1278" alt="All done!" src="https://github.com/user-attachments/assets/bb048435-87b3-4d73-b677-05bc603deb2d" />
+<img width="590" height="1278" alt="My Plants -" src="https://github.com/user-attachments/assets/25f91970-82c3-4ba1-8888-17dfac026b6d" />
+
+
+</div>
+
+###
