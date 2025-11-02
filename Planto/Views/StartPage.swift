@@ -61,6 +61,16 @@ struct StartPage: View {
                 ReminderSheetView(isFirstTimeUser: $isFirstTimeUser, store: store)
                     .presentationDetents([.large, .large])
             }
+        
+            .onAppear {
+                NotificationManager.requestAuthorizationIfNeeded()
+            }
+            .onChange(of: isShowingSheet, initial: false) { oldValue, newValue in
+                if newValue == false {
+                    NotificationManager.scheduleAll(for: store.reminders)
+                }
+            }
+
         }
     }
 }
@@ -69,5 +79,6 @@ struct StartPage: View {
 {
     StartPage()
 }
+
 
 

@@ -221,7 +221,13 @@ struct ProgPage: View {
                                             }
                                         }
                                     }
-                                    .onDelete { indexSet in store.delete(at: indexSet) }
+                                    .onDelete { indexSet in
+                                            for index in indexSet {
+                                                let reminder = store.reminders[index]
+                                                NotificationManager.cancelNotification(for: reminder)
+                                            }
+                                            store.delete(at: indexSet)
+                                        }
                                 }
                             }
                         }
@@ -299,4 +305,5 @@ private struct HorizontalListPaddingIfOldiOS: ViewModifier {
         }
     }
 }
+
 
