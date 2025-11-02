@@ -1,6 +1,6 @@
 <h1 align="left">Planto🌱 </h1>
 
-<h2 align="left">An iOS app that helps people to set daily reminders by watering and nurturing their plants to grow to accomplish their goals.
+<h2 align="left">An iOS app that helps people to set daily reminders by watering and nurturing their plants to grow to accomplish their goals.</h2>
 
 
 <h2 align="left">App features: </h2>
@@ -30,4 +30,7 @@
 <img src="https://github.com/user-attachments/assets/970a8869-5d99-4f18-9d6b-aaccd67bbd6a" alt="All done!" width="45%">
 </div>
 
+<div align="center">
+<img src="https://github.com/user-attachments/assets/df6d792f-03d2-42d2-9880-871f59eae998"alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-02 at 14 48 25" width="45%" />
+</div>
 ###
