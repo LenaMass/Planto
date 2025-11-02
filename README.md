@@ -11,7 +11,7 @@
   <li>Adding plants and editing them 
 </li>
   <li>Progress view to each reminder that’s completed 
-/li>
+</li>
    <li>dark mode available and supported.
 </li>
 </ul>
